@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080';
+  private apiUrl = 'https://memegen-back.onrender.com';
 
   constructor(private http: HttpClient) {}
 

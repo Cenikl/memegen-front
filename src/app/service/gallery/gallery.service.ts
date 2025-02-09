@@ -12,7 +12,7 @@ export interface ImageDto {
   providedIn: 'root'
 })
 export class GalleryService {
-  private apiUrl = 'http://localhost:8080';
+  private apiUrl = 'https://memegen-back.onrender.com';
 
   constructor(private http: HttpClient) { }
 
