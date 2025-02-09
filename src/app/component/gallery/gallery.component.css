@@ -121,8 +121,9 @@
 }
 
 .fa-spinner {
-  font-size: 50px;
-  margin-top: 50px;
+  font-size: 13px;
+  width: 15px;
+  height: 20px;
 }
 
 .upload-placeholder:hover {
