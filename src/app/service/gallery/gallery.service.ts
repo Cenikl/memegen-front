@@ -1,0 +1,44 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+export interface ImageDto {
+  name: string;
+  imageOwner: string;
+  url: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class GalleryService {
+  private apiUrl = 'http://localhost:8080';
+
+  constructor(private http: HttpClient) { }
+
+  getImages(token: string): Observable<ImageDto[]> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<ImageDto[]>(`${this.apiUrl}/images`, { headers });
+  }
+
+  uploadFile(token: string, formData: FormData): Observable<ImageDto> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<ImageDto>(`${this.apiUrl}/image/send`, formData, { headers });
+  }
+
+  updateFile(token: string, url: string, ): Observable<ImageDto> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<ImageDto>(`${this.apiUrl}/image/update`, { headers });
+  }
+
+  deleteFile(token : string, imageUrl: string): Observable<ImageDto> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<ImageDto>(`${this.apiUrl}/image/delete?imageUrl=${imageUrl}`,null, { headers });
+  }
+
+  downloadFile(token : string, url: string): Observable<ImageDto> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any>(`${this.apiUrl}/image/download?imageUrl=${url}`, { headers });
+  }
+
+}

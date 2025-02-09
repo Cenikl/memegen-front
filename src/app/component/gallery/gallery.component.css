@@ -1,0 +1,82 @@
+.gallery-container {
+  padding: 20px;
+}
+
+.upload-button {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.images-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.image-item {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview {
+  width: 200px;
+  height: auto;
+  display: block;
+}
+
+/* The overlay appears only on hover */
+.image-item .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5); /* White, semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.image-item:hover .overlay {
+  opacity: 1;
+}
+
+.icon {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.2s;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+/* Modal styles for image view */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-image {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 10px #fff;
+}

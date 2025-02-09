@@ -1,0 +1,28 @@
+<div class="gallery-container">
+  <h1 class="gallery-title">Gallery</h1>
+  <button class="upload-button" (click)="uploadImage()">+</button>
+  <hr class="underline" />
+
+  <div *ngIf="loading">Loading images...</div>
+  <div *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <!-- Images List -->
+  <div class="images-list" *ngIf="!loading && !errorMessage">
+    <div class="image-item" *ngFor="let image of images">
+      <img [src]="image.url" alt="{{ image.name }}" class="image-preview" />
+      <!-- Overlay that appears on hover -->
+      <div class="overlay">
+        <!-- Stop propagation on click so that the overlay click doesn’t trigger image click -->
+        <span class="icon" title="Delete" (click)="deleteImage(image, $event)">&#10060;</span>
+        <span class="icon" title="Update" (click)="updateImage(image, $event)">&#9998;</span>
+        <span class="icon" title="Download" (click)="downloadImage(image, $event)">&#128229;</span>
+        <span class="icon" title="View" (click)="viewImage(image, $event)">&#128065;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for viewing image -->
+  <div class="modal" *ngIf="previewImage" (click)="closeViewModal($event)">
+    <img [src]="previewImage.url" alt="{{ previewImage.name }}" class="modal-image" />
+  </div>
+</div>
