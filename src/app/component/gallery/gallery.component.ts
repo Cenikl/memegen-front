@@ -1,14 +1,14 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { GalleryService } from '../../service/gallery/gallery.service';
 import { CommonModule } from '@angular/common';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-gallery',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,NgxPaginationModule],
   templateUrl: './gallery.component.html',
   styleUrl: './gallery.component.css'
 })
@@ -19,6 +19,8 @@ export class GalleryComponent implements OnInit {
   previewImage: any = null;
   showShareModal = false;
   selectedImageUrl: string = '';
+  page: number = 1;
+
 
   constructor(
     private galleryService: GalleryService,

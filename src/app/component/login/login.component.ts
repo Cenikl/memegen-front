@@ -22,6 +22,7 @@ export class LoginComponent {
   isForgotPasswordVisible: boolean = false;
   isResetPassword: boolean = false;
   username: string = "";
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -47,17 +48,19 @@ export class LoginComponent {
   }
 
   onLogin() {
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid) {  
+      this.isLoading = true;
       const username = this.loginForm.get('username')?.value;
       const password = this.loginForm.get('password')?.value;
 
       this.authService.login(username, password).subscribe({
-        next: (response: any) => {
+        next: (response: any) => { 
+          this.isLoading = false;
           const token = response.token;
           this.cookieService.set('auth_token', token, 1, '/');
           this.router.navigate(['/gallery']);
         },
-        error: (err: any) => console.error('Login failed', err)
+        error: (err: any) => this.isLoading = false
       });
     }
   }
@@ -70,6 +73,7 @@ export class LoginComponent {
     this.isForgotPasswordVisible = true;
     this.isLoginVisible = false;
     this.isResetPassword = false
+    console.log("checked")
   }
 
   showLoginForm(): void {
@@ -88,11 +92,13 @@ export class LoginComponent {
     if (this.forgotPasswordForm.invalid) {
       return;
     }
+    this.isLoading = true;
     const username = this.forgotPasswordForm.value.username;
  
     this.authService.findUser(username).subscribe({
       next: (response: any) => {
         if (response.exists) {
+          this.isLoading = false;
           this.username = username;
           this.showResetForm();
         } else {
@@ -100,6 +106,7 @@ export class LoginComponent {
         }
       },
       error: (err: any) => {
+        this.isLoading = false;
         alert('Error checking username');
       }
     });
@@ -109,13 +116,16 @@ export class LoginComponent {
     if (this.resetPasswordForm.invalid) {
       return;
     }
+    this.isLoading = true;
     const password = this.resetPasswordForm.value.password;
  
     this.authService.resetPassword(this.username,password).subscribe({
       next: (response: any) => {
+        this.isLoading = false;
         this.showLoginForm();
       },
-      error: (err: any) => {
+      error: (err: any) => {  
+        this.isLoading = false;
         alert('Error checking username');
       }
     });

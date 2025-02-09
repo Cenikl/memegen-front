@@ -1,31 +1,298 @@
-.login-container {
-  width: 300px;
-  margin: 100px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
+/* Background container with split effect */
+.login-container:hover {
+  background-color: #333;
 }
 
-input {
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
   width: 100%;
-  padding: 8px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  box-sizing: border-box;
+  overflow: hidden; /* Prevents scrolling */
 }
 
+.background-container {
+  display: flex;
+  height: 98vh;
+  width: 99vw;
+  background-color: #003366;
+  position: fixed; /* Ensures it covers the screen */
+  margin: 1px;
+}
+
+@keyframes roam {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(50px, 30px); }
+  50% { transform: translate(-40px, -20px); }
+  75% { transform: translate(30px, -50px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* Left side - Animations for icons */
+.left-side i {
+  font-size: 50px;
+  color: white;
+  opacity: 0.8;
+  transition: transform 0.3s;
+  position: absolute;
+}
+
+.left-side i.floating {
+  animation: roam 4s infinite alternate ease-in-out, bounce 2s infinite;
+}
+
+.website-name {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.typing-effect {
+  display: inline-block;
+  width: 0;
+  color: rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid #fff; /* Creates the blinking cursor effect */
+  animation: typing 2s steps(20) 1s forwards, blink 1s step-end infinite;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: rgba(255, 255, 255, 0.8) }
+}
+
+/* Description styling */
+.website-description {
+  font-size: 18px;
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0;
+  color: rgba(255, 255, 255, 0.8);
+  animation: fadeIn 2s forwards 4s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.left-side i:nth-child(1) { top: 85%; left: 5%; animation-delay: 0s; }
+.left-side i:nth-child(2) { top: 85%; left: 27%; animation-delay: 0.5s; }
+.left-side i:nth-child(3) { top: 85%; left: 45%; animation-delay: 1s; }
+.left-side i:nth-child(4) { top: 85%; left: 64%; animation-delay: 1.5s; }
+.left-side i:nth-child(5) { top: 85%; left: 83%; animation-delay: 2s; }
+
+/* Left side background */
+.left-side {
+  flex: 1.5;
+  background-color: #003366;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.left-side i {
+  font-size: 50px;
+  color: white;
+  opacity: 0.8;
+  transition: transform 0.3s;
+}
+
+.left-side i:hover {
+  transform: scale(1.1);
+}
+
+.image-slider {
+  position: relative;
+  width: 80%;
+  height: 300px; /* Adjust height as needed */
+  border-radius: 7px;
+  overflow: hidden;
+  margin-top: 20px; /* Optional spacing */
+}
+
+.fa-spinner {
+  margin-right: 5px;
+}
+
+/* Style for each slide (image) */
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0; /* Start hidden */
+  animation: fadeAnimation 20s infinite;
+}
+
+/* Keyframes for fading effect */
+@keyframes fadeAnimation {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 1;
+  }
+  33% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Right side - White background with gray icons */
+.right-side {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('https://www.picmaker.com/assets/images/memegenerator/meme_generator_ogimage.svg') no-repeat center center/cover;
+  position: relative;
+  border-radius: 7px;
+}
+
+
+/* Centered Login Container */
+.login-container {
+  width: 350px;
+  padding: 25px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.login-container:hover {
+  transform: scale(1.02);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Form styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Headings */
+h2 {
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* Labels */
+label {
+  font-weight: 600;
+  color: #555;
+  display: block;
+  text-align: left;
+}
+
+/* Inputs */
+input {
+  width: 93%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+}
+
+/* Buttons */
 button {
   width: 100%;
-  padding: 10px;
-  background-color: #007bff;
+  padding: 12px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background: linear-gradient(135deg, #003366, #003f8a);
+  transform: scale(1.03);
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Links and extra options */
+.register-link, .forgot-password-link {
+  margin-top: 10px;
+}
+
+.register-link p {
+  font-size: 15px;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s;
+  margin-bottom:15px;
+}
+
+.forgot-password-link button {
+  font-size: 16px;
+  color: #555;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+/* Error messages */
+.error {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+  text-align: left;
 }

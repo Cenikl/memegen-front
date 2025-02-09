@@ -1,30 +1,190 @@
+/* Parent wrapper covering the full viewport */
+.page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 98vh;
+  border-radius: 7px;
+  background-color: #0A1F44; /* Deep blue background */
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Animated bubble background container */
+.bubble-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allow clicks to pass through */
+  z-index: 0;
+}
+
+/* Style for each animated bubble */
+.bubble {
+  position: absolute;
+  bottom: -100px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  animation: float 15s linear infinite;
+}
+
+/* Floating animation keyframes */
+@keyframes float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-100vh) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Customize individual bubbles for variety */
+.bubble1 { left: 10%; width: 40px; height: 40px; animation-duration: 12s; animation-delay: 2s; }
+.bubble2 { left: 30%; width: 60px; height: 60px; animation-duration: 15s; animation-delay: 4s; }
+.bubble3 { left: 50%; width: 30px; height: 30px; animation-duration: 10s; animation-delay: 1s; }
+.bubble4 { left: 70%; width: 50px; height: 50px; animation-duration: 18s; animation-delay: 3s; }
+.bubble5 { left: 85%; width: 20px; height: 20px; animation-duration: 8s;  animation-delay: 0s; }
+
+/* Registration container (modal) styling */
 .register-container {
-    width: 300px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+  position: relative;
+  width: 350px;
+  padding: 2rem;
+  background: linear-gradient(135deg, #132f4c, #0a1f44); /* Light gradient for depth */
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  color: #f9f9f9; /* Light text for readability */
+  z-index: 1;
+}
+
+.register-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, #102a43, #243b55);
+  animation: rotateBg 20s linear infinite;
+  z-index: -1;
+  filter: blur(50px);
+  opacity: 0.4;
+}
+
+@keyframes rotateBg {
+  from {
+    transform: rotate(0deg);
   }
-  
-  .form-group {
-    margin-bottom: 15px;
+  to {
+    transform: rotate(360deg);
   }
-  
-  .form-control {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .btn {
-    width: 100%;
-    padding: 10px;
-  }
-  
-  .error {
-    color: red;
-    font-size: 12px;
-  }
-  
+}
+
+/* Heading styling */
+.register-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.fa-spinner {
+  margin-right: 5px;
+}
+
+/* Form group styling */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #d1e0e0;
+  font-weight: 600;
+}
+
+/* Input field styling */
+.form-control {
+  width: 92%;
+  padding: 0.75rem;
+  border: 1px solid #355a7d;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: white;
+  color: rgba(27, 25, 25, 0.71);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control::placeholder {
+  color: #a0a0a0bc;
+}
+
+.form-control:focus {
+  border-color: #4e9eff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(78, 158, 255, 0.5);
+}
+
+/* Button styling */
+.btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #4e9eff;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+  background-color: #3c8de0;
+  transform: translateY(-2px);
+}
+
+.btn:disabled {
+  background-color: #7abaff;
+  cursor: not-allowed;
+}
+
+/* Error message styling */
+.error {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* Login link styling */
+.login-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.login-link p {
+  font-size: 0.9rem;
+  color: #d1e0e0;
+}
+
+.login-link button {
+  background: none;
+  border: none;
+  color: #4e9eff;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.login-link button:hover {
+  color: #3c8de0;
+}

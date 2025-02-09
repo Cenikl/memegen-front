@@ -1,23 +1,37 @@
 <div class="gallery-container">
-  <h1 class="gallery-title">Gallery</h1>
-  <button class="upload-button" (click)="uploadImage()">+</button>
+  <h1 class="gallery-title">Gallery</h1> 
   <hr class="underline" />
 
-  <div *ngIf="loading">Loading images...</div>
+  <div *ngIf="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
   <div *ngIf="errorMessage">{{ errorMessage }}</div>
 
-  <!-- Images List -->
   <div class="images-list" *ngIf="!loading && !errorMessage">
-    <div class="image-item" *ngFor="let image of images">
+    <!-- First item: Upload button styled as an image -->
+    <div class="image-item upload-placeholder" (click)="uploadImage()">
+      <button class="upload-button">+</button>
+    </div>
+
+    <!-- Existing Images -->
+    <div class="image-item" *ngFor="let image of images | paginate: { itemsPerPage: 10, currentPage: page }">
       <img [src]="image.url" alt="{{ image.name }}" class="image-preview" />
-      <!-- Overlay that appears on hover -->
       <div class="overlay">
-        <!-- Stop propagation on click so that the overlay click doesn’t trigger image click -->
-        <span class="icon" title="Delete" (click)="deleteImage(image, $event)">&#10060;</span>
-        <span class="icon" title="Update" (click)="updateImage(image, $event)">&#9998;</span>
-        <span class="icon" title="View" (click)="viewImage(image, $event)">&#128065;</span>
-        <span class="icon" title="Download" (click)="downloadImage(image, $event)">&#128229;</span>
-        <span class="icon" title="Share" (click)="openShareModal(image, $event)">&#128279;</span>
+        <span class="icon" title="Delete" (click)="deleteImage(image, $event)">
+          <i class="fa-solid fa-trash"></i>
+        </span>
+        <span class="icon" title="Update" (click)="updateImage(image, $event)">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </span>
+        <span class="icon" title="View" (click)="viewImage(image, $event)">
+          <i class="fa-regular fa-eye"></i>
+        </span>
+        <span class="icon" title="Download" (click)="downloadImage(image, $event)">
+          <i class="fa-regular fa-circle-down"></i>
+        </span>
+        <span class="icon" title="Share" (click)="openShareModal(image, $event)">
+          <i class="fa-regular fa-share-from-square"></i>
+        </span>
       </div>
       <div class="share-modal" *ngIf="showShareModal">
         <div class="share-card">
@@ -33,7 +47,10 @@
       </div>
     </div>
   </div>
-
+  <hr class="underline" />
+  <div class="pgin">
+    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+  </div>  
   <!-- Modal for viewing image -->
   <div class="modal" *ngIf="previewImage" (click)="closeViewModal($event)">
     <img [src]="previewImage.url" alt="{{ previewImage.name }}" class="modal-image" />

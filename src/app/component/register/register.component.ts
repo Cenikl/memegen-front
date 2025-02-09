@@ -15,6 +15,7 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class RegisterComponent {
   registerForm: FormGroup;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -42,17 +43,20 @@ export class RegisterComponent {
     if (this.registerForm.invalid) {
       return;
     }
+    this.isLoading = true;
 
     const username = this.registerForm.get('username')?.value;
     const password = this.registerForm.get('password')?.value;
 
     this.authService.register(username,password).subscribe({
       next: (response: any) => {
+        this.isLoading = false;
         const token = response.token;
         this.cookieService.set('auth_token', token, 1, '/');
         this.router.navigate(['/gallery']);
       },
       error: (err: any) => {
+        this.isLoading = false;
         alert('Registration failed. Please try again.');
       },
     });
