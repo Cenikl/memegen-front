@@ -1,60 +1,79 @@
 <div style="margin-bottom: 1rem;">
-    <!-- Image upload and control buttons -->
-    <input type="file" accept="image/*" (change)="onFileChange($event)" />
-    <button (click)="addTextZone()" [disabled]="imageLoaded == false">
-      Add Text Zone
-    </button>
-    <button (click)="saveImage()" [disabled]="imageLoaded == false">
-      Save Image
-    </button>
-  </div>
+  <!-- Image upload and control buttons -->
+  <input type="file" accept="image/*" (change)="onFileChange($event)" />
+  <button (click)="addTextZone()" [disabled]="!imageLoaded">
+    Add Text Zone
+  </button>
+  <button (click)="saveImage()" [disabled]="!imageLoaded">
+    Save Image
+  </button>
+</div>
 
-  <!-- Main editing area -->
-  <div #container style="position: relative; display: inline-block; border: 1px solid #ccc;">
-    <!-- The main canvas shows the loaded image -->
-    <canvas #imageCanvas width="600" height="400"></canvas>
+<!-- Main editing area -->
+<div #container style="position: relative; display: inline-block; border: 1px solid #ccc;"  
+(click)="hideCustomizeControls()">
+  <!-- The main canvas shows the loaded image -->
+  <canvas #imageCanvas width="600" height="600"></canvas>
 
-    <!-- Render each text zone as an overlay -->
-    <ng-container *ngFor="let zone of textZones">
+  <!-- Render each text zone as an overlay -->
+  <ng-container *ngFor="let zone of textZones">
+    <div 
+      class="text-zone"
+      [ngStyle]="{
+        left: zone.x + 'px', 
+        top: zone.y + 'px',
+        width: zone.width + 'px',
+        height: zone.height + 'px',
+        'font-size': zone.fontSize + 'px',
+        color: zone.color,
+        'font-family': zone.fontFamily
+      }"
+    >
+      <!-- Drag handle -->
+      <div class="drag-handle" (mousedown)="startDrag($event, zone)"></div>
+      <!-- Customize Button -->
+      <button class="customize-btn" (click)="toggleCustomizeControls($event, zone)">⚙</button>
+
+      <!-- Editable text area -->
       <div 
-        class="text-zone" 
-        [ngStyle]="{
-          left: zone.x + 'px', 
-          top: zone.y + 'px',
-          width: zone.width + 'px',
-          height: zone.height + 'px',
-          'font-size': zone.fontSize + 'px'
-        }"
-      >
-        <!-- Drag handle (click here to move the zone) -->
-        <div class="drag-handle" (mousedown)="startDrag($event, zone)"></div>
-        <!-- Editable text area.
-             Note: We no longer use interpolation here.
-             Instead, the element’s content is managed by the browser,
-             and we update the model via (input) and (blur) events. -->
-        <div 
-          class="editable-text" 
-          contenteditable="true" 
-          data-placeholder="Enter text here"
-          (focus)="onTextFocus($event, zone)"
-          (blur)="onTextBlur($event, zone)"
-          (input)="updateZoneText($event, zone)"
-        ></div>
-        <!-- Resize handle (drag here to change size) -->
-        <div class="resize-handle" (mousedown)="startResize($event, zone)"></div>
+        class="editable-text" 
+        contenteditable="true" 
+        data-placeholder="Enter text here"
+        (focus)="onTextFocus($event, zone)"
+        (blur)="onTextBlur($event, zone)"
+        (input)="updateZoneText($event, zone)"
+        [style.color]="zone.color"
+      ></div>
+      <!-- Resize handle -->
+      <div class="resize-handle" (mousedown)="startResize($event, zone)"></div>
+      <!-- Customization controls -->
+      <div class="customize-controls" *ngIf="currentFocusedZoneId === zone.id" (click)="$event.stopPropagation()">
+        <!-- Text color picker -->
+        <input type="color" [(ngModel)]="zone.color" title="Select text color" />
+        <!-- Font family selector -->
+        <select [(ngModel)]="zone.fontFamily">
+          <option value="Arial">Arial</option>
+          <option value="Helvetica">Helvetica</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <!-- Add more fonts as needed -->
+        </select>
+        <button type="button" [(ngModel)]="zone.fontSize" (click)="changeFontSize(zone,1)">+</button>
+        <button type="button" [(ngModel)]="zone.fontSize" (click)="changeFontSize(zone,-1)">-</button>
       </div>
-    </ng-container>
-  </div>
+    </div>
+  </ng-container>
+</div>
 
-  <!-- Real-time preview: Before and After -->
-  <div class="preview-container" style="display: flex; align-items: center; margin-top: 1rem;">
-    <div class="preview-box">
-      <h3>Before</h3>
-      <canvas #beforeCanvas width="300" height="200" style="border: 1px solid #ccc;"></canvas>
-    </div>
-    <div class="arrow" style="margin: 0 1rem; font-size: 2rem;">&#8594;</div>
-    <div class="preview-box">
-      <h3>After</h3>
-      <canvas #afterCanvas width="300" height="200" style="border: 1px solid #ccc;"></canvas>
-    </div>
+<!-- Real-time preview: Before and After -->
+<div class="preview-container" style="display: flex; align-items: center; margin-top: 1rem;">
+  <div class="preview-box">
+    <h3>Before</h3>
+    <canvas #beforeCanvas width="300" height="200" style="border: 1px solid #ccc;"></canvas>
   </div>
+  <div class="arrow" style="margin: 0 1rem; font-size: 2rem;">&#8594;</div>
+  <div class="preview-box">
+    <h3>After</h3>
+    <canvas #afterCanvas width="300" height="200" style="border: 1px solid #ccc;"></canvas>
+  </div>
+</div>

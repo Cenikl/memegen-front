@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, ViewChild, AfterViewInit,OnDestroy,} from '@angular/core';
+import { Component, ElementRef, ViewChild,OnDestroy, OnInit,} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GalleryService } from '../../service/gallery/gallery.service';
+import { GalleryService, ImageDto } from '../../service/gallery/gallery.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 
@@ -15,6 +15,8 @@ interface TextZone {
   height: number;
   text: string;
   fontSize: number;
+  color: string;
+  fontFamily: string;
 }
 
 @Component({
@@ -24,23 +26,22 @@ interface TextZone {
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.css'
 })
-export class EditorComponent implements AfterViewInit, OnDestroy {
+export class EditorComponent implements OnInit, OnDestroy {
   @ViewChild('imageCanvas', { static: true })
   canvasRef!: ElementRef<HTMLCanvasElement>;
-
   @ViewChild('container', { static: true })
   containerRef!: ElementRef<HTMLDivElement>;
-
   @ViewChild('beforeCanvas', { static: true })
   beforeCanvasRef!: ElementRef<HTMLCanvasElement>;
-
   @ViewChild('afterCanvas', { static: true })
   afterCanvasRef!: ElementRef<HTMLCanvasElement>;
 
   imageLoaded = false;
   image?: HTMLImageElement;
   textZones: TextZone[] = [];
+  filename: string = "default";
   private nextZoneId = 0;
+  currentFocusedZoneId: number | null = null;
 
   // Variables for moving a text zone.
   private currentDragZone: TextZone | null = null;
@@ -55,7 +56,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   private initialZoneHeight = 0;
   private initialFontSize = 0;
 
-  // Bound event handlers so they can be added/removed.
+  // Bound event handlers.
   private onDragBound = this.onDrag.bind(this);
   private onDragStopBound = this.onDragStop.bind(this);
   private onResizeBound = this.onResize.bind(this);
@@ -65,9 +66,26 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     private http: HttpClient,
     private galleryService: GalleryService,
     private cookieService: CookieService,
-    private router: Router) {}
+    private router: Router
+  ) {}
 
-  ngAfterViewInit(): void {}
+  ngOnInit(): void {
+    // Check if an image was passed via router state
+    const state = history.state;
+    if (state && state.image) {
+      const imageDto: ImageDto = state.image;
+      this.filename = imageDto.name;
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        this.image = img;
+        this.imageLoaded = true;
+        this.drawMainCanvas();
+        this.updatePreview();
+      };
+      img.src = imageDto.url;
+    }
+  }
 
   ngOnDestroy(): void {
     document.removeEventListener('mousemove', this.onDragBound);
@@ -76,11 +94,12 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     document.removeEventListener('mouseup', this.onResizeStopBound);
   }
 
-  // Loads the image from the selected file.
+  // Called when a file is selected.
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      this.filename = file.name;
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         const result = e.target?.result;
@@ -99,7 +118,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // Draws the loaded image on the main canvas.
+  // Draw the main canvas.
   drawMainCanvas(): void {
     const canvas = this.canvasRef.nativeElement;
     const ctx = canvas.getContext('2d');
@@ -109,7 +128,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  // Adds a new text zone. (Text starts empty so that the CSS placeholder shows.)
+  // Adds a new text zone with default customization values.
   addTextZone(): void {
     const newZone: TextZone = {
       id: this.nextZoneId++,
@@ -118,34 +137,43 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       width: 150,
       height: 50,
       text: '',
-      fontSize: 20
+      fontSize: 20,
+      color: '#000000',        // default black color
+      fontFamily: 'Arial'      // default font family
     };
     this.textZones.push(newZone);
     this.updatePreview();
   }
 
-  // Update the zone's text when the user types.
   updateZoneText(event: Event, zone: TextZone): void {
     const target = event.target as HTMLElement;
     zone.text = target.innerText;
     this.updatePreview();
   }
 
-  // Optional: When the text zone receives focus, you might clear the default text.
-  onTextFocus(event: Event, zone: TextZone): void {
-    const target = event.target as HTMLElement;
-    // If needed, you could clear the text if it equals a default value.
-    // For now, we leave it as-is so that the user can position the caret.
+  toggleCustomizeControls(event: Event, zone: TextZone): void {
+    event.stopPropagation();
+    this.currentFocusedZoneId = this.currentFocusedZoneId === zone.id ? null : zone.id;
+  }
+  
+  hideCustomizeControls(): void {
+    this.currentFocusedZoneId = null;
   }
 
-  // When the text zone loses focus, update the model.
+  onTextFocus(event: Event, zone: TextZone): void {
+  }
+
   onTextBlur(event: Event, zone: TextZone): void {
     const target = event.target as HTMLElement;
     zone.text = target.innerText;
     this.updatePreview();
   }
 
-  // ******* DRAGGING (Moving) A TEXT ZONE *******
+  changeFontSize(zone:TextZone, holder: number): void {
+    zone.fontSize= zone.fontSize + holder ;
+  }
+
+  // ******* DRAGGING A TEXT ZONE *******
   startDrag(event: MouseEvent, zone: TextZone): void {
     event.preventDefault();
     event.stopPropagation();
@@ -162,7 +190,6 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       const containerRect = this.containerRef.nativeElement.getBoundingClientRect();
       let newX = event.clientX - containerRect.left - this.dragOffsetX;
       let newY = event.clientY - containerRect.top - this.dragOffsetY;
-      // Constrain the zone within the canvas.
       newX = Math.max(0, Math.min(newX, this.canvasRef.nativeElement.width - this.currentDragZone.width));
       newY = Math.max(0, Math.min(newY, this.canvasRef.nativeElement.height - this.currentDragZone.height));
       this.currentDragZone.x = newX;
@@ -195,12 +222,10 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     if (this.currentResizeZone) {
       const deltaX = event.clientX - this.resizeStartX;
       const deltaY = event.clientY - this.resizeStartY;
-      // Set minimum limits for width and height.
       const newWidth = Math.max(50, this.initialZoneWidth + deltaX);
       const newHeight = Math.max(20, this.initialZoneHeight + deltaY);
       this.currentResizeZone.width = newWidth;
       this.currentResizeZone.height = newHeight;
-      // Optionally adjust the font size based on the new height.
       this.currentResizeZone.fontSize = Math.max(12, Math.floor(newHeight * 0.5));
       this.updatePreview();
     }
@@ -216,7 +241,7 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
   updatePreview(): void {
     if (!this.image) { return; }
 
-    // Update the "Before" preview (original image)
+    // "Before" preview: base image only.
     const beforeCanvas = this.beforeCanvasRef.nativeElement;
     const beforeCtx = beforeCanvas.getContext('2d');
     if (beforeCtx) {
@@ -224,20 +249,18 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
       beforeCtx.drawImage(this.image, 0, 0, beforeCanvas.width, beforeCanvas.height);
     }
 
-    // Update the "After" preview (composite image)
+    // "After" preview: composite image.
     const afterCanvas = this.afterCanvasRef.nativeElement;
     const afterCtx = afterCanvas.getContext('2d');
     if (afterCtx) {
       afterCtx.clearRect(0, 0, afterCanvas.width, afterCanvas.height);
-      // Determine scale factors (main canvas is 600×400; preview is 300×200)
       const scaleX = afterCanvas.width / this.canvasRef.nativeElement.width;
       const scaleY = afterCanvas.height / this.canvasRef.nativeElement.height;
-      // Draw the base image.
       afterCtx.drawImage(this.image, 0, 0, afterCanvas.width, afterCanvas.height);
-      // Draw each text zone.
       for (const zone of this.textZones) {
-        afterCtx.font = zone.fontSize * scaleY + 'px Arial';
-        afterCtx.fillStyle = 'black';
+        // Use the zone's font size, font family, and color.
+        afterCtx.font = zone.fontSize * scaleY + 'px ' + zone.fontFamily;
+        afterCtx.fillStyle = zone.color;
         const lines = zone.text.split('\n');
         for (let i = 0; i < lines.length; i++) {
           afterCtx.fillText(
@@ -256,25 +279,21 @@ export class EditorComponent implements AfterViewInit, OnDestroy {
     const ctx = canvas.getContext('2d');
     if (ctx && this.image) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Draw the base image on the main canvas.
       ctx.drawImage(this.image, 0, 0, canvas.width, canvas.height);
-      // Overlay each text zone.
       for (const zone of this.textZones) {
-        ctx.font = zone.fontSize + 'px Arial';
-        ctx.fillStyle = 'black';
+        ctx.font = zone.fontSize + 'px ' + zone.fontFamily;
+        ctx.fillStyle = zone.color;
         const lines = zone.text.split('\n');
         for (let i = 0; i < lines.length; i++) {
           ctx.fillText(lines[i], zone.x, zone.y + zone.fontSize * (i + 1));
         }
       }
       this.imageLoaded = false;
-      // Convert the canvas to a Blob (PNG) and send via HTTP POST.
       canvas.toBlob((blob) => {
         if (blob) {
           const formData = new FormData();
-          formData.append('file', blob);
-          
-          this.galleryService.uploadFile(this.cookieService.get("auth_token"),formData).subscribe(
+          formData.append('file', blob, this.filename);
+          this.galleryService.uploadFile(this.cookieService.get("auth_token"), formData).subscribe(
             (response) => this.router.navigate(['/gallery']),
             (error) => alert('Error saving image')
           );

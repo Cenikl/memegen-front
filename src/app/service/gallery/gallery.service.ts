@@ -33,12 +33,14 @@ export class GalleryService {
 
   deleteFile(token : string, imageUrl: string): Observable<ImageDto> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put<ImageDto>(`${this.apiUrl}/image/delete?imageUrl=${imageUrl}`,null, { headers });
+    return this.http.put<any>(`${this.apiUrl}/image/delete?imageUrl=${imageUrl}`,null, { headers });
   }
 
-  downloadFile(token : string, url: string): Observable<ImageDto> {
+  downloadFile(token : string, url: string): Observable<Blob> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any>(`${this.apiUrl}/image/download?imageUrl=${url}`, { headers });
+    return this.http.get(
+      `${this.apiUrl}/image/download?imageUrl=${encodeURIComponent(url)}`,
+       { headers, responseType: 'blob' });
   }
 
 }

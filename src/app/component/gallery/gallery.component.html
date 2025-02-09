@@ -15,8 +15,21 @@
         <!-- Stop propagation on click so that the overlay click doesn’t trigger image click -->
         <span class="icon" title="Delete" (click)="deleteImage(image, $event)">&#10060;</span>
         <span class="icon" title="Update" (click)="updateImage(image, $event)">&#9998;</span>
-        <span class="icon" title="Download" (click)="downloadImage(image, $event)">&#128229;</span>
         <span class="icon" title="View" (click)="viewImage(image, $event)">&#128065;</span>
+        <span class="icon" title="Download" (click)="downloadImage(image, $event)">&#128229;</span>
+        <span class="icon" title="Share" (click)="openShareModal(image, $event)">&#128279;</span>
+      </div>
+      <div class="share-modal" *ngIf="showShareModal">
+        <div class="share-card">
+          <button class="close-btn" (click)="closeShareModal()">✖</button>
+          <h3>Share Image</h3>
+          <button (click)="shareTo('facebook')">Facebook</button>
+          <button (click)="shareTo('x')">X (Twitter)</button>
+          <button (click)="shareTo('whatsapp')">WhatsApp</button>
+          <button (click)="shareTo('instagram')">Instagram</button>
+          <button (click)="shareTo('reddit')">Reddit</button>
+          <button (click)="shareTo('URL')">Copy Url</button>
+        </div>
       </div>
     </div>
   </div>

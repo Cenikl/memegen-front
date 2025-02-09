@@ -16,8 +16,9 @@ export class GalleryComponent implements OnInit {
   images: any[] = [];
   loading: boolean = true;
   errorMessage: string = '';
-  // Used for the modal view
   previewImage: any = null;
+  showShareModal = false;
+  selectedImageUrl: string = '';
 
   constructor(
     private galleryService: GalleryService,
@@ -36,6 +37,7 @@ export class GalleryComponent implements OnInit {
       next: (data) => {
         this.images = data;
         this.loading = false;
+        console.log(data)
       },
       error: (err) => {
         console.error('Failed to fetch images:', err);
@@ -89,12 +91,54 @@ export class GalleryComponent implements OnInit {
   downloadImage(image: any, event: MouseEvent): void {
     event.stopPropagation();
     this.galleryService.downloadFile(this.cookieService.get('auth_token'),image.url).subscribe({
-      next: (response) => {
-        console.log('Download triggered successfully', response);
+      next: (blob : Blob) => {
+        let extension = '.png';
+        if (image.name && image.name.toLowerCase().endsWith('.jpeg')) {
+          extension = '.jpeg';
+        } else if (image.name && image.name.toLowerCase().endsWith('.jpg')) {
+          extension = '.jpg';
+        }
+        // Use the image name if available or a default filename.
+        const filename = image.name ? image.name : `downloaded_image${extension}`;
+        console.log(extension)
+        console.log(image.name)
+
+        // Create an object URL for the Blob
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
       },
       error: (err) => {
         console.error('Download request failed:', err);
       }
     });
     }
+    openShareModal(image: any, event: Event) {
+      event.stopPropagation();
+      this.selectedImageUrl = image.url;
+      this.showShareModal = true;
+    }
+    
+    closeShareModal() {
+      this.showShareModal = false;
+    }
+    
+    shareTo(platform: string,) {
+      const shareLinks : any = {
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.selectedImageUrl)}`,
+        x: `https://x.com/intent/post?url=${encodeURIComponent(this.selectedImageUrl)}&text=Check%20this%20out!`,
+        whatsapp: `https://wa.me/?text=${encodeURIComponent(this.selectedImageUrl)}`,
+        instagram: `https://www.instagram.com/?url=${encodeURIComponent(this.selectedImageUrl)}`,
+        reddit: `https://www.reddit.com/submit?url=${encodeURIComponent(this.selectedImageUrl)}&title=Cool%20Image`,
+        URL: this.selectedImageUrl
+      };
+    
+      window.open(shareLinks[platform], "_blank");
+    }
+
 }
