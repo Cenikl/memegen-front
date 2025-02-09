@@ -20,6 +20,8 @@ export class GalleryComponent implements OnInit {
   showShareModal = false;
   selectedImageUrl: string = '';
   page: number = 1;
+  isLoading1 = false;
+  isLoading2 = false;
 
 
   constructor(
@@ -39,7 +41,6 @@ export class GalleryComponent implements OnInit {
       next: (data) => {
         this.images = data;
         this.loading = false;
-        console.log(data)
       },
       error: (err) => {
         console.error('Failed to fetch images:', err);
@@ -49,48 +50,48 @@ export class GalleryComponent implements OnInit {
     });
   }
 
-  // Navigate to the editor (for new image uploads)
   uploadImage(): void {
     this.router.navigate(['/editor']);
   }
 
-  // Trigger delete request for an image.
-  // The second parameter ($event) is used to stop event propagation.
+  signOut(): void {
+    this.cookieService.delete("auth_token");
+    this.router.navigate(['/login']);
+  }
+
   deleteImage(image: any, event: MouseEvent): void {
+    this.isLoading1 = true;
     event.stopPropagation();
     this.galleryService.deleteFile(this.cookieService.get("auth_token"),image.url).subscribe({
       next: () => {
+        this.isLoading1 = false;
         this.images = this.images.filter(img => img.url !== image.url);
       },
       error: (err) => {
+        this.isLoading1 = false;
         console.error('Failed to delete image:', err);
       }
     });
   }
 
-  // Navigate to the editor while passing the selected image.
-  // This assumes your editor can read the navigation state.
   updateImage(image: any, event: MouseEvent): void {
     event.stopPropagation();
     this.router.navigate(['/editor'], { state: { image } });
   }
 
-  // Open the modal view to display the full image.
   viewImage(image: any, event: MouseEvent): void {
     event.stopPropagation();
     this.previewImage = image;
   }
 
-  // Close the modal view when clicking on the dark background.
   closeViewModal(event: MouseEvent): void {
-    // Only close if the click is on the modal container itself (and not the image).
     if ((event.target as HTMLElement).classList.contains('modal')) {
       this.previewImage = null;
     }
   }
 
-  // Download the image by programmatically creating an anchor element.
   downloadImage(image: any, event: MouseEvent): void {
+    this.isLoading2 = true;
     event.stopPropagation();
     this.galleryService.downloadFile(this.cookieService.get('auth_token'),image.url).subscribe({
       next: (blob : Blob) => {
@@ -100,12 +101,7 @@ export class GalleryComponent implements OnInit {
         } else if (image.name && image.name.toLowerCase().endsWith('.jpg')) {
           extension = '.jpg';
         }
-        // Use the image name if available or a default filename.
         const filename = image.name ? image.name : `downloaded_image${extension}`;
-        console.log(extension)
-        console.log(image.name)
-
-        // Create an object URL for the Blob
         const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
@@ -113,9 +109,11 @@ export class GalleryComponent implements OnInit {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        this.isLoading2 = false;
         window.URL.revokeObjectURL(downloadUrl);
       },
       error: (err) => {
+        this.isLoading2 = false;
         console.error('Download request failed:', err);
       }
     });

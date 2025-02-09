@@ -2,17 +2,15 @@ body,html {
   background-color: #003366;
 }
 
-/* Animated bubble background container */
 .bubble-container {
   position: absolute;
   top: 0;
   width: 90%;
   height: 80%;
-  pointer-events: none; /* Allow clicks to pass through */
+  pointer-events: none;
   z-index: 0;
 }
 
-/* Style for each animated bubble */
 .bubble {
   position: absolute;
   bottom: -100px;
@@ -21,7 +19,6 @@ body,html {
   animation: float 15s linear infinite;
 }
 
-/* Floating animation keyframes */
 @keyframes float {
   0% {
     transform: translateY(0) scale(1);
@@ -33,7 +30,6 @@ body,html {
   }
 }
 
-/* Customize individual bubbles for variety */
 .bubble1 { left: 10%; width: 40px; height: 40px; animation-duration: 12s; animation-delay: 2s; }
 .bubble2 { left: 30%; width: 60px; height: 60px; animation-duration: 15s; animation-delay: 4s; }
 .bubble3 { left: 50%; width: 30px; height: 30px; animation-duration: 10s; animation-delay: 1s; }

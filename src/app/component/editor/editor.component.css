@@ -1,82 +1,240 @@
+.page-wrapper {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+}
+
+.editor-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  margin-bottom: 10px;
+}
+
+.inp-file {
+  opacity: 0;
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.custom-file-btn {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-file-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.custom-file-btn:active {
+  background-color: #003366;
+  transform: translateY(2px);
+}
+
+#file-name {
+  font-size: 14px;
+}
+
+#file-name.selected {
+  color: #28a745;
+}
+
+.control-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.control-btn:not(:disabled):hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn:active {
+  background-color: #003366;
+  transform: translateY(2px);
+}
+
+@media (max-width: 768px) {
+  .editor-controls {
+    flex-direction: column;
+  }
+
+  .button-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.editing {
+  display: flex;
+  flex-direction: row;
+}
+
+.canvas-container {
+  margin-left: 5px;
+}
+
+.img-container {
+  border-radius: 5px;
+}
+
 .text-zone {
   position: absolute;
-  border: 1px dashed #000;
-  background: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px dashed #003366;
+  border-radius: 6px;
+  padding: 5px;
   box-sizing: border-box;
 }
 
-.drag-handle {
+.resize-handle {
+  position: absolute;
+  background-color: #003366;
+  border-radius: 50%;
   width: 12px;
   height: 12px;
-  background: lightgray;
-  border: 1px solid #000;
-  position: absolute;
-  top: -8px;
+  cursor: pointer;
+}
+
+.resize-handle {
+  bottom: -8px;
   right: -8px;
-  cursor: move;
-  z-index: 10;
 }
 
 .customize-btn {
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border: 1px solid #000;
   position: absolute;
-  top: -8px;
-  left: -8px;
-  cursor: pointer;
-  font-size: 12px;
+  top: -11px;
+  left: -11px;
+  background-color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
   text-align: center;
-  z-index: 10;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.customize-btn:hover {
+  background-color: rgb(135, 135, 135);
+  color: white;
+}
+
+.customize-btn:focus {
+  outline: none;
+}
+
+.close-btn {
+  position: absolute;
+  top: -10px;
+  right: -9px;
+  background-color: #fff;
+  color: #ff4d4d;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+.close-btn:hover {
+  background-color: #e60000;
+  color: #fff;
+}
+
+.close-btn:focus {
+  outline: none;
 }
 
 .editable-text {
   width: 100%;
   height: 100%;
-  padding: 4px;
-  box-sizing: border-box;
-  outline: none;
-  cursor: text;
-}
-
-/* A simple CSS placeholder for contenteditable */
-.editable-text:empty:before {
-  content: attr(data-placeholder);
-  color: gray;
-}
-
-.resize-handle {
-  width: 12px;
-  height: 12px;
-  background: darkgray;
-  border: 1px solid #000;
-  position: absolute;
-  bottom: -6px;
-  right: -6px;
-  cursor: nwse-resize;
-  z-index: 10;
-}
-
-/* NEW: Customization controls for text color and font family */
-.customize-controls {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 5px 8px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-}
-
-.customize-controls input,
-.customize-controls select {
   border: none;
   background: transparent;
   outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  resize: none;
+}
+
+.editable-text:empty:before {
+  content: attr(data-placeholder);
+  color: #ccc;
+}
+
+.customize-controls {
+  position: absolute;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+.fa-spinner {
+  margin-right: 5px;
+}
+
+.customize-controls input, .customize-controls select {
+  border: 1px solid #ddd;
+  padding: 5px;
   font-size: 14px;
-  cursor: pointer;
-  z-index: 1000;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-basis: 70%;
+}
+
+.preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.arrow {
+  font-size: 2rem;
+  color: #003366;
 }

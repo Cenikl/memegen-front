@@ -6,7 +6,6 @@ import { GalleryService, ImageDto } from '../../service/gallery/gallery.service'
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 
-// A simple interface representing a text zone overlay.
 interface TextZone {
   id: number;
   x: number;
@@ -22,7 +21,7 @@ interface TextZone {
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './editor.component.html',
   styleUrl: './editor.component.css'
 })
@@ -42,21 +41,16 @@ export class EditorComponent implements OnInit, OnDestroy {
   filename: string = "default";
   private nextZoneId = 0;
   currentFocusedZoneId: number | null = null;
-
-  // Variables for moving a text zone.
+  isLoading = false;
   private currentDragZone: TextZone | null = null;
   private dragOffsetX = 0;
   private dragOffsetY = 0;
-
-  // Variables for resizing a text zone.
   private currentResizeZone: TextZone | null = null;
   private resizeStartX = 0;
   private resizeStartY = 0;
   private initialZoneWidth = 0;
   private initialZoneHeight = 0;
   private initialFontSize = 0;
-
-  // Bound event handlers.
   private onDragBound = this.onDrag.bind(this);
   private onDragStopBound = this.onDragStop.bind(this);
   private onResizeBound = this.onResize.bind(this);
@@ -70,7 +64,6 @@ export class EditorComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Check if an image was passed via router state
     const state = history.state;
     if (state && state.image) {
       const imageDto: ImageDto = state.image;
@@ -94,7 +87,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     document.removeEventListener('mouseup', this.onResizeStopBound);
   }
 
-  // Called when a file is selected.
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -118,7 +110,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Draw the main canvas.
   drawMainCanvas(): void {
     const canvas = this.canvasRef.nativeElement;
     const ctx = canvas.getContext('2d');
@@ -128,7 +119,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Adds a new text zone with default customization values.
   addTextZone(): void {
     const newZone: TextZone = {
       id: this.nextZoneId++,
@@ -137,11 +127,16 @@ export class EditorComponent implements OnInit, OnDestroy {
       width: 150,
       height: 50,
       text: '',
-      fontSize: 20,
-      color: '#000000',        // default black color
-      fontFamily: 'Arial'      // default font family
+      fontSize: 15,
+      color: '#000000',
+      fontFamily: 'Arial'
     };
     this.textZones.push(newZone);
+    this.updatePreview();
+  }
+
+  closeTextZone(zoneId: number) {
+    this.textZones = this.textZones.filter(zone => zone.id !== zoneId);
     this.updatePreview();
   }
 
@@ -154,13 +149,19 @@ export class EditorComponent implements OnInit, OnDestroy {
   toggleCustomizeControls(event: Event, zone: TextZone): void {
     event.stopPropagation();
     this.currentFocusedZoneId = this.currentFocusedZoneId === zone.id ? null : zone.id;
+    this.updatePreview();
   }
   
   hideCustomizeControls(): void {
     this.currentFocusedZoneId = null;
+    this.updatePreview();
   }
 
   onTextFocus(event: Event, zone: TextZone): void {
+  }
+
+  goToGallery(): void {
+    this.router.navigate(['/gallery']);
   }
 
   onTextBlur(event: Event, zone: TextZone): void {
@@ -170,10 +171,10 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   changeFontSize(zone:TextZone, holder: number): void {
-    zone.fontSize= zone.fontSize + holder ;
+    zone.fontSize= zone.fontSize + holder;
+    this.updatePreview();
   }
 
-  // ******* DRAGGING A TEXT ZONE *******
   startDrag(event: MouseEvent, zone: TextZone): void {
     event.preventDefault();
     event.stopPropagation();
@@ -204,7 +205,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     document.removeEventListener('mouseup', this.onDragStopBound);
   }
 
-  // ******* RESIZING A TEXT ZONE *******
   startResize(event: MouseEvent, zone: TextZone): void {
     event.preventDefault();
     event.stopPropagation();
@@ -237,19 +237,14 @@ export class EditorComponent implements OnInit, OnDestroy {
     document.removeEventListener('mouseup', this.onResizeStopBound);
   }
 
-  // ******* REAL‑TIME PREVIEW UPDATE *******
   updatePreview(): void {
     if (!this.image) { return; }
-
-    // "Before" preview: base image only.
     const beforeCanvas = this.beforeCanvasRef.nativeElement;
     const beforeCtx = beforeCanvas.getContext('2d');
     if (beforeCtx) {
       beforeCtx.clearRect(0, 0, beforeCanvas.width, beforeCanvas.height);
       beforeCtx.drawImage(this.image, 0, 0, beforeCanvas.width, beforeCanvas.height);
     }
-
-    // "After" preview: composite image.
     const afterCanvas = this.afterCanvasRef.nativeElement;
     const afterCtx = afterCanvas.getContext('2d');
     if (afterCtx) {
@@ -258,7 +253,6 @@ export class EditorComponent implements OnInit, OnDestroy {
       const scaleY = afterCanvas.height / this.canvasRef.nativeElement.height;
       afterCtx.drawImage(this.image, 0, 0, afterCanvas.width, afterCanvas.height);
       for (const zone of this.textZones) {
-        // Use the zone's font size, font family, and color.
         afterCtx.font = zone.fontSize * scaleY + 'px ' + zone.fontFamily;
         afterCtx.fillStyle = zone.color;
         const lines = zone.text.split('\n');
@@ -273,8 +267,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ******* SAVE THE COMPOSITE IMAGE *******
   saveImage(): void {
+    this.isLoading = true;
     const canvas = this.canvasRef.nativeElement;
     const ctx = canvas.getContext('2d');
     if (ctx && this.image) {
@@ -289,13 +283,18 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
       }
       this.imageLoaded = false;
+
       canvas.toBlob((blob) => {
         if (blob) {
           const formData = new FormData();
           formData.append('file', blob, this.filename);
           this.galleryService.uploadFile(this.cookieService.get("auth_token"), formData).subscribe(
-            (response) => this.router.navigate(['/gallery']),
-            (error) => alert('Error saving image')
+            (response) => {
+              this.isLoading = false;
+              this.router.navigate(['/gallery'])},
+            (error) => {
+              this.isLoading = false;
+              alert('Error saving image')}
           );
         }
       });

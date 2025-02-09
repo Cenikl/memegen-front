@@ -1,6 +1,10 @@
 <div class="gallery-container">
-  <h1 class="gallery-title">Gallery</h1> 
-  <hr class="underline" />
+  <div class="gallery-header">
+    <h1 class="gallery-title">Gallery</h1>
+    <button class="signout-btn" (click)="signOut()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </button>
+  </div>
 
   <div *ngIf="loading">
     <i class="fas fa-spinner fa-spin"></i>
@@ -8,17 +12,17 @@
   <div *ngIf="errorMessage">{{ errorMessage }}</div>
 
   <div class="images-list" *ngIf="!loading && !errorMessage">
-    <!-- First item: Upload button styled as an image -->
     <div class="image-item upload-placeholder" (click)="uploadImage()">
       <button class="upload-button">+</button>
     </div>
-
-    <!-- Existing Images -->
-    <div class="image-item" *ngFor="let image of images | paginate: { itemsPerPage: 10, currentPage: page }">
+    <div class="image-item" *ngFor="let image of images | paginate: { itemsPerPage: 17, currentPage: page }">
       <img [src]="image.url" alt="{{ image.name }}" class="image-preview" />
       <div class="overlay">
         <span class="icon" title="Delete" (click)="deleteImage(image, $event)">
-          <i class="fa-solid fa-trash"></i>
+          <span *ngIf="!isLoading1"><i class="fa-solid fa-trash"></i></span>
+          <span *ngIf="isLoading1">
+            <i class="fas fa-spinner fa-spin"></i>
+          </span>
         </span>
         <span class="icon" title="Update" (click)="updateImage(image, $event)">
           <i class="fa-solid fa-pen-to-square"></i>
@@ -27,7 +31,10 @@
           <i class="fa-regular fa-eye"></i>
         </span>
         <span class="icon" title="Download" (click)="downloadImage(image, $event)">
-          <i class="fa-regular fa-circle-down"></i>
+          <span *ngIf="!isLoading2"><i class="fa-regular fa-circle-down"></i></span>
+          <span *ngIf="isLoading2">
+            <i class="fas fa-spinner fa-spin"></i>
+          </span>
         </span>
         <span class="icon" title="Share" (click)="openShareModal(image, $event)">
           <i class="fa-regular fa-share-from-square"></i>
@@ -51,7 +58,6 @@
   <div class="pgin">
     <pagination-controls (pageChange)="page = $event"></pagination-controls>
   </div>  
-  <!-- Modal for viewing image -->
   <div class="modal" *ngIf="previewImage" (click)="closeViewModal($event)">
     <img [src]="previewImage.url" alt="{{ previewImage.name }}" class="modal-image" />
   </div>

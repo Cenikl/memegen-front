@@ -5,7 +5,7 @@
   </div>
 
   <div class="website-description">
-    <p>Simple online tool to help you editing your own memes !</p>
+    <p>Simple online tool to help you edit your own memes !</p>
   </div>
 
   <div class="image-slider">
@@ -42,17 +42,14 @@
         </button>
       </form>
 
-      <!-- Button to navigate to the register page -->
       <div class="register-link" *ngIf="isLoginVisible">
         <p>First time? -- Register here <button (click)="goToRegister()">Register here</button></p>
       </div>
 
-      <!-- Forgot Password Link -->
       <div class="forgot-password-link" *ngIf="isLoginVisible">
         <button (click)="showForgotPasswordForm()">Forgot Password?</button>
       </div>
 
-      <!-- Forgot Password Form (conditional display) -->
       <div *ngIf="isForgotPasswordVisible" class="forgot-password-form">
         <h3>Forgot Password</h3>
         <form [formGroup]="forgotPasswordForm" (ngSubmit)="onSubmitForgotPassword()">
@@ -70,7 +67,6 @@
         <button (click)="showLoginForm()">Cancel</button>
       </div>
 
-      <!-- Forgot Password Form (conditional display) -->
       <div *ngIf="isResetPassword" class="reset-password-form">
         <h3>Reset Password</h3>
         <form [formGroup]="resetPasswordForm" (ngSubmit)="onSubmitResetPassword()">
