@@ -40,18 +40,6 @@
           <i class="fa-regular fa-share-from-square"></i>
         </span>
       </div>
-      <div class="share-modal" *ngIf="showShareModal">
-        <div class="share-card">
-          <button class="close-btn" (click)="closeShareModal()">✖</button>
-          <h3>Share Image</h3>
-          <button (click)="shareTo('facebook')">Facebook</button>
-          <button (click)="shareTo('x')">X (Twitter)</button>
-          <button (click)="shareTo('whatsapp')">WhatsApp</button>
-          <button (click)="shareTo('instagram')">Instagram</button>
-          <button (click)="shareTo('reddit')">Reddit</button>
-          <button (click)="shareTo('URL')">Copy Url</button>
-        </div>
-      </div>
     </div>
   </div>
   <hr class="underline" />
@@ -60,5 +48,17 @@
   </div>  
   <div class="modal" *ngIf="previewImage" (click)="closeViewModal($event)">
     <img [src]="previewImage.url" alt="{{ previewImage.name }}" class="modal-image" />
+  </div>
+  <div class="share-modal" *ngIf="showShareModal">
+    <div class="share-card">
+      <button class="close-btn" (click)="closeShareModal()">✖</button>
+      <h3>Share Image</h3>
+      <button (click)="shareTo('facebook')">Facebook</button>
+      <button (click)="shareTo('x')">X (Twitter)</button>
+      <button (click)="shareTo('whatsapp')">WhatsApp</button>
+      <button (click)="shareTo('instagram')">Instagram</button>
+      <button (click)="shareTo('reddit')">Reddit</button>
+      <button (click)="shareTo('URL')">Copy Url</button>
+    </div>
   </div>
 </div>

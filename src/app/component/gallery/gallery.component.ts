@@ -120,6 +120,7 @@ export class GalleryComponent implements OnInit {
     }
     openShareModal(image: any, event: Event) {
       this.showShareModal = true;
+      event.stopPropagation();
       this.selectedImageUrl = image.url;
     }
     
